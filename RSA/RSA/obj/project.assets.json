@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\College\\Algorithms\\Project\\RSA\\RSA\\RSA.csproj",
+      "projectUniqueName": "D:\\Projects\\RSA\\RSA\\RSA\\RSA.csproj",
       "projectName": "RSA",
-      "projectPath": "D:\\College\\Algorithms\\Project\\RSA\\RSA\\RSA.csproj",
+      "projectPath": "D:\\Projects\\RSA\\RSA\\RSA\\RSA.csproj",
       "packagesPath": "C:\\Users\\Mina\\.nuget\\packages\\",
-      "outputPath": "D:\\College\\Algorithms\\Project\\RSA\\RSA\\obj\\",
+      "outputPath": "D:\\Projects\\RSA\\RSA\\RSA\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Mina\\AppData\\Roaming\\NuGet\\NuGet.Config",

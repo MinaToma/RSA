@@ -9,3 +9,14 @@ D:\College\Algorithms\Project\RSA\RSA\bin\Debug\netcoreapp3.0\RSA.dll
 D:\College\Algorithms\Project\RSA\RSA\bin\Debug\netcoreapp3.0\RSA.pdb
 D:\College\Algorithms\Project\RSA\RSA\obj\Debug\netcoreapp3.0\RSA.dll
 D:\College\Algorithms\Project\RSA\RSA\obj\Debug\netcoreapp3.0\RSA.pdb
+D:\Projects\RSA\RSA\RSA\bin\Debug\netcoreapp3.0\RSA.exe
+D:\Projects\RSA\RSA\RSA\bin\Debug\netcoreapp3.0\RSA.deps.json
+D:\Projects\RSA\RSA\RSA\bin\Debug\netcoreapp3.0\RSA.runtimeconfig.json
+D:\Projects\RSA\RSA\RSA\bin\Debug\netcoreapp3.0\RSA.runtimeconfig.dev.json
+D:\Projects\RSA\RSA\RSA\bin\Debug\netcoreapp3.0\RSA.dll
+D:\Projects\RSA\RSA\RSA\bin\Debug\netcoreapp3.0\RSA.pdb
+D:\Projects\RSA\RSA\RSA\obj\Debug\netcoreapp3.0\RSA.csprojAssemblyReference.cache
+D:\Projects\RSA\RSA\RSA\obj\Debug\netcoreapp3.0\RSA.AssemblyInfoInputs.cache
+D:\Projects\RSA\RSA\RSA\obj\Debug\netcoreapp3.0\RSA.AssemblyInfo.cs
+D:\Projects\RSA\RSA\RSA\obj\Debug\netcoreapp3.0\RSA.dll
+D:\Projects\RSA\RSA\RSA\obj\Debug\netcoreapp3.0\RSA.pdb
