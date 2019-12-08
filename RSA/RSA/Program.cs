@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+
 
 namespace RSA
 {
@@ -53,7 +56,7 @@ namespace RSA
             BigInteger e = new BigInteger("7");
             BigInteger n = new BigInteger("3713");
 
-            RSACore rsa = new RSACore(m, e, n);
+            RSACore rsa = new RSACore( m, e, n);
             Console.WriteLine(rsa.encrypt());
 
             Console.WriteLine(rsa.decrypt());

@@ -26,14 +26,6 @@ namespace RSA
             value = val;
         }
 
-        public string getStringValue()
-        {
-            string val = "";
-            for (int i = 0; i < value.Count; i++)
-                val += value[i];
-            return val;
-        }
-
         public BigInteger Add(BigInteger secondNumber)
         {
             if (secondNumber.value[0] == '-')
@@ -178,6 +170,58 @@ namespace RSA
         public int CompareTo(BigInteger secondNumber)
         {
             return isSmaller(value, secondNumber.value);
+        }
+
+        public bool IsPrime()
+        {
+            var one = new BigInteger("1");
+            var two = new BigInteger("2");
+            int k = 10;
+            if (this.ToString() == "1" || this.ToString() == "0" || this.ToString() == "4")
+                return false;
+            if (this.ToString() == "2" || this.ToString() == "3")
+                return true;
+            var d = this.Sub(one);
+
+            while (d.Mod(two).ToString() == "0")
+            {
+                d = d.Div(two);
+            }
+
+            for (int i = 0; i < k; i++)
+            {
+                if (miillerTest(d, this) == false)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public BigInteger Sqrt()
+        {
+
+            BigInteger startVal = new BigInteger("0");
+            BigInteger endVal = new BigInteger(value);
+            BigInteger sqrtVal = new BigInteger("0");
+
+            while (isSmaller(startVal.value, endVal.value) <= 0)
+            {
+                var sumOfTwo = startVal.Add(endVal);
+                var midVAl = sumOfTwo.Div(new BigInteger(_two));
+                var newMidVAl = midVAl.Mul(midVAl);
+
+                if (isSmaller(newMidVAl.value, value) <= 0)
+                {
+                    sqrtVal = midVAl;
+                    startVal = midVAl.Add(new BigInteger(_one));
+                }
+                else
+                {
+                    endVal = midVAl.Sub(new BigInteger(_one));
+                }
+            }
+            return sqrtVal;
+
         }
 
         private List<char> PowerModHelper(List<char> number, List<char> power, List<char> mod)
@@ -422,5 +466,31 @@ namespace RSA
             return list.Select(s => s).ToList();
         }
 
+        private bool miillerTest(BigInteger d, BigInteger n)
+        {
+            Random r = new Random();
+
+            BigInteger rand = new BigInteger((r.Next()).ToString());
+            rand = rand.Mod(n.Sub(new BigInteger("4")));
+            rand = rand.Add(new BigInteger("2"));
+
+            var x = rand.PowerMod(d, n);
+            var n_1 = n.Sub(new BigInteger("1"));
+            if (x.ToString() == "1" || isSmaller(x.value, n_1.value) == 0)
+                return true;
+
+            while (isSmaller(d.value, n_1.value) != 0)
+            {
+                x = x.Mul(x);
+                x = x.Mod(n);
+                d = d.Mul(new BigInteger("2"));
+
+                if (x.ToString() == "1")
+                    return false;
+                if (isSmaller(x.value, n_1.value) == 0)
+                    return true;
+            }
+            return false;
+        }
     }
 }
