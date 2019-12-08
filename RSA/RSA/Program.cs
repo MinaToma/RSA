@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+
 
 namespace RSA
 {
@@ -53,10 +56,16 @@ namespace RSA
             BigInteger e = new BigInteger("7");
             BigInteger n = new BigInteger("3713");
 
-            RSACore rsa = new RSACore(m, e, n);
+            RSACore rsa = new RSACore( m, e, n);
             Console.WriteLine(rsa.encrypt());
 
             Console.WriteLine(rsa.decrypt());
+
+            /*
+           string mod = "2039896550861909479";
+           int pow = 7;
+           string d = "1165655170271755543"; 
+            */
 
             /*char cont;
             do
