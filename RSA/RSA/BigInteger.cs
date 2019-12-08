@@ -26,6 +26,14 @@ namespace RSA
             value = val;
         }
 
+        public string getStringValue()
+        {
+            string val = "";
+            for (int i = 0; i < value.Count; i++)
+                val += value[i];
+            return val;
+        }
+
         public BigInteger Add(BigInteger secondNumber)
         {
             if (secondNumber.value[0] == '-')
