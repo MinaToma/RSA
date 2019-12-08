@@ -52,14 +52,30 @@ namespace RSA
         static void Main(string[] args)
         {
 
-            BigInteger m = new BigInteger("2003");
+            /*BigInteger m = new BigInteger("2003");
             BigInteger e = new BigInteger("7");
             BigInteger n = new BigInteger("3713");
 
             RSACore rsa = new RSACore( m, e, n);
             Console.WriteLine(rsa.encrypt());
 
-            Console.WriteLine(rsa.decrypt());
+            Console.WriteLine(rsa.decrypt());*/
+            /*
+            RSAKeyGenerator rSAKeyGenerator = new RSAKeyGenerator();
+
+            int bitLength = 4;
+            var prime1 = rSAKeyGenerator.GetPrimeNumber(bitLength/2);
+            var prime2 = rSAKeyGenerator.GetPrimeNumber(bitLength/2);
+            var N = rSAKeyGenerator.GetN(prime1, prime2);
+            var PHI = rSAKeyGenerator.GetPhi(prime1, prime2);
+            var E = rSAKeyGenerator.GetE(PHI,bitLength);
+            // not sure it work 
+            var D = rSAKeyGenerator.GetD(PHI, E);
+            Console.WriteLine(E.ToString());
+            Console.WriteLine(N.ToString());
+            Console.WriteLine(D.ToString());
+            */
+            
 
             /*
            string mod = "2039896550861909479";
