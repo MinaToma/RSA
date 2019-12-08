@@ -61,6 +61,12 @@ namespace RSA
 
             Console.WriteLine(rsa.decrypt());
 
+            /*
+           string mod = "2039896550861909479";
+           int pow = 7;
+           string d = "1165655170271755543"; 
+            */
+
             /*char cont;
             do
             {

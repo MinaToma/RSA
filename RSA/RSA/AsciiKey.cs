@@ -22,22 +22,18 @@ namespace RSA
             }
             return ans.ToString();
         }
+
         public static string GetAsciiString(string msg)
         {
             string ans = "";
             var msgBigInteger = new BigInteger(msg);
             while (msg != "0")
             {
-                var mod = msgBigInteger.Mod( _base);
+                var mod = msgBigInteger.Mod(_base);
                 ans += (char)int.Parse(mod.ToString());
                 msgBigInteger = msgBigInteger.Div(_base);
             }
-            string revAns = "";
-            for (int j = ans.Length - 1; j >= 0; j--)
-            {
-                revAns += ans[j];
-            }
-            return revAns;
+            return new string(ans.ToCharArray().Reverse().ToArray());
         }
 
         private static string converAsciiToDecimal(char ch)
