@@ -80,7 +80,7 @@ namespace RSA
                 return new BigInteger(AddHelper(Clone(value), posValue.value));
             }
 
-            return new BigInteger(subHelper(Clone(value), Clone(secondNumber.value)));
+            return new BigInteger(SubHelper(Clone(value), Clone(secondNumber.value)));
         }
 
         public BigInteger Mul(BigInteger secondNumber)
@@ -176,7 +176,7 @@ namespace RSA
         {
             var one = new BigInteger("1");
             var two = new BigInteger("2");
-            int k = 10;
+            int k = 4;
 
             if (this.ToString() == "1" || this.ToString() == "0" || this.ToString() == "4")
                 return false;
@@ -233,7 +233,7 @@ namespace RSA
             if (IsSmaller(res.remainder, secondList) != -1)
             {
                 res.quotient = AddHelper(res.quotient, Clone(_one));
-                res.remainder = subHelper(res.remainder, secondList);
+                res.remainder = SubHelper(res.remainder, secondList);
                 return res;
             }
 
@@ -298,7 +298,7 @@ namespace RSA
             var right_right_result = MulHelper(firstNumberH, secondNumberH);
             var leftF_rightF__leftS_rightS = MulHelper(AddHelper(firstNmberL, firstNumberH), AddHelper(secondNumberL, secondNumberH));
 
-            leftF_rightF__leftS_rightS = subHelper(subHelper(leftF_rightF__leftS_rightS, left_left_result), right_right_result);
+            leftF_rightF__leftS_rightS = SubHelper(SubHelper(leftF_rightF__leftS_rightS, left_left_result), right_right_result);
 
             AppendZeros(leftF_rightF__leftS_rightS, highLen);
             leftF_rightF__leftS_rightS = AddHelper(leftF_rightF__leftS_rightS, right_right_result);
@@ -308,7 +308,7 @@ namespace RSA
             return AddHelper(left_left_result, leftF_rightF__leftS_rightS);
         }
 
-        private List<char> subHelper(List<char> firstList, List<char> secondList)
+        private List<char> SubHelper(List<char> firstList, List<char> secondList)
         {
             var NegRes = false;
             if (IsSmaller(firstList, secondList) == -1)

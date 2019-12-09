@@ -8,6 +8,63 @@ namespace RSA
     {
         private static BigInteger _zero = new BigInteger("0");
         private static BigInteger _one = new BigInteger("1");
+        private static BigInteger _two = new BigInteger("2");
+        private static string numericalString = "0123456789";
+
+        public BigInteger GetPrimeNumber(int length)
+        {
+            string number = "";
+            Random r = new Random();
+            for (int i = 0; i < length; i++)
+            {
+                if (i == 0)
+                    number += numericalString[r.Next(1, 9)];
+                else
+                    number += numericalString[r.Next(0, 9)];
+            }
+
+            if ((number[length - 1] - '0') % 2 == 0)
+            {
+                char num = number[length - 1];
+                number.Remove(length - 1);
+                number += (num + 1);
+            }
+
+            BigInteger pirmeNumber = new BigInteger(number);
+
+            while (!pirmeNumber.IsPrime())
+                pirmeNumber = pirmeNumber.Add(_two);
+
+            return pirmeNumber;
+        }
+
+        public BigInteger GetPhi(BigInteger firstPrime, BigInteger secondPrime)
+        {
+            firstPrime = firstPrime.Sub(_one);
+            return firstPrime.Mul(secondPrime.Sub(_one));
+        }
+
+        public BigInteger GetE(BigInteger phi, int length)
+        {
+            BigInteger e = new BigInteger("0");
+            e = GetPrimeNumber(1);
+            Random r = new Random();
+
+            while (phi.Mod(e).CompareTo(_zero) == 1)
+                e = GetPrimeNumber(r.Next(1, length - 1));
+
+            return e;
+        }
+
+        public BigInteger GetN(BigInteger firstPrime, BigInteger secondPrime)
+        {
+            return firstPrime.Mul(secondPrime);
+        }
+
+        public BigInteger GetD(BigInteger phi, BigInteger e)
+        {
+            return e.PowerMod(phi.Sub(_two), phi);
+        }
 
         public static BigInteger GeneratePrivateKey(BigInteger e, BigInteger mod)
         {
@@ -19,10 +76,7 @@ namespace RSA
 
             ExtendedGCD(e, phi, ref x, ref y);
 
-            while (x.isNeg())
-            {
-                x = x.Add(phi);
-            }
+
 
             return x;
         }
