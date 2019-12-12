@@ -17,7 +17,7 @@ namespace RSA
             _power = new BigInteger(power);
             _mod = new BigInteger(mod);
 
-            _powerInverse = RSAKeyGenerator.GeneratePrivateKey(_power, _mod);
+           // _powerInverse = RSAKeyGenerator.GeneratePrivateKey(_power, _mod);
         }
 
         public RSACore(BigInteger number, BigInteger power, BigInteger mod)
@@ -26,7 +26,7 @@ namespace RSA
             _power = power;
             _mod = mod;
 
-            _powerInverse = RSAKeyGenerator.GeneratePrivateKey(_power, _mod);
+           // _powerInverse = RSAKeyGenerator.GeneratePrivateKey(_power, _mod);
         }
 
         public BigInteger encrypt()

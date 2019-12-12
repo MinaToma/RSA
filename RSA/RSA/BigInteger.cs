@@ -199,6 +199,26 @@ namespace RSA
             return true;
         }
 
+        public static BigInteger operator +(BigInteger firstValue, BigInteger secondValue)
+        {
+            return firstValue.Add(secondValue);
+        }
+
+        public static BigInteger operator -(BigInteger firstValue, BigInteger secondValue)
+        {
+            return firstValue.Sub(secondValue);
+        }
+
+        public static BigInteger operator *(BigInteger firstValue, BigInteger secondValue)
+        {
+            return firstValue.Mul(secondValue);
+        }
+
+        public static BigInteger operator /(BigInteger firstValue, BigInteger secondValue)
+        {
+            return firstValue.Div(secondValue);
+        }
+
         private List<char> PowerModHelper(List<char> number, List<char> power, List<char> mod)
         {
             var res = Clone(_one);
@@ -466,24 +486,6 @@ namespace RSA
                     return true;
             }
             return false;
-        }
-
-
-        public static BigInteger operator +(BigInteger firstValue, BigInteger secondValue)
-        {
-            return firstValue.Add(secondValue);
-        }
-        public static BigInteger operator -(BigInteger firstValue, BigInteger secondValue)
-        {
-            return firstValue.Sub(secondValue);
-        }
-        public static BigInteger operator *(BigInteger firstValue, BigInteger secondValue)
-        {
-            return firstValue.Mul(secondValue);
-        }
-        public static BigInteger operator /(BigInteger firstValue, BigInteger secondValue)
-        {
-            return firstValue.Div(secondValue);
         }
     }
 }
