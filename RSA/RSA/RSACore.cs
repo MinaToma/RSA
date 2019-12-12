@@ -16,27 +16,19 @@ namespace RSA
             _number = new BigInteger(number);
             _power = new BigInteger(power);
             _mod = new BigInteger(mod);
-
-           // _powerInverse = RSAKeyGenerator.GeneratePrivateKey(_power, _mod);
         }
 
-        public RSACore(BigInteger number, BigInteger power, BigInteger mod)
+        public RSACore(BigInteger number, BigInteger power, BigInteger mod, BigInteger powerInverse)
         {
             _number = number;
             _power = power;
             _mod = mod;
-
-           // _powerInverse = RSAKeyGenerator.GeneratePrivateKey(_power, _mod);
+            _powerInverse = powerInverse;
         }
 
         public BigInteger encrypt()
         {
             return _number.PowerMod(_power, _mod);
-        }
-
-        public BigInteger decrypt()
-        {
-            return _number.PowerMod(_power, _mod).PowerMod(_powerInverse, _mod);
         }
     }
 }

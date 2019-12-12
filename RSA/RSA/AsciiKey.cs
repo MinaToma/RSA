@@ -41,11 +41,5 @@ namespace RSA
             int number = (int)ch;
             return number.ToString();
         }
-
-        /*
-            string mod = "2039896550861909479";
-            int pow = 7;
-            string d = "1165655170271755543"; 
-         */
     }
 }

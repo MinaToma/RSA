@@ -6,21 +6,46 @@ namespace RSA
 {
     public class RSAKeyGenerator
     {
-        private static BigInteger _zero = new BigInteger("0");
-        private static BigInteger _one = new BigInteger("1");
-        private static BigInteger _two = new BigInteger("2");
-        private static string numericalString = "0123456789";
+        private BigInteger _zero = new BigInteger("0");
+        private BigInteger _one = new BigInteger("1");
+        private BigInteger _two = new BigInteger("2");
+        private string numericalString = "0123456789";
+        private int primeLength = 4;
 
-        public BigInteger GetPrimeNumber(int length)
+        public RSAKey GenerateRSAKeys()
+        {
+            var firstPrime = GetPrimeNumber(primeLength);
+            var secondPrime = GetPrimeNumber(primeLength);
+
+            while(secondPrime.CompareTo(firstPrime) == 0)
+            {
+                secondPrime = GetPrimeNumber(primeLength);
+            }
+
+            Console.WriteLine(firstPrime + " " + secondPrime);
+
+            var mod = GetMod(firstPrime, secondPrime);
+            var phi = GetPhi(firstPrime, secondPrime);
+            var publicKey = GetPublicKey(phi, primeLength - 1);
+            var privateKey = GeneratePrivateKey(publicKey, firstPrime, secondPrime);
+
+            return new RSAKey(privateKey, publicKey, mod);
+        }
+
+        private BigInteger GetPrimeNumber(int length)
         {
             string number = "";
             Random r = new Random();
             for (int i = 0; i < length; i++)
             {
                 if (i == 0)
+                {
                     number += numericalString[r.Next(1, 9)];
+                }
                 else
+                {
                     number += numericalString[r.Next(0, 9)];
+                }
             }
 
             if ((number[length - 1] - '0') % 2 == 0)
@@ -33,56 +58,63 @@ namespace RSA
             BigInteger primeNumber = new BigInteger(number);
 
             while (!primeNumber.IsPrime())
+            {
                 primeNumber += _two;
+            }
+
+            if(primeNumber.value.Count > primeLength)
+            {
+                return GetPrimeNumber(primeLength);
+            }
 
             return primeNumber;
         }
 
-        public BigInteger GetPhi(BigInteger firstPrime, BigInteger secondPrime)
+        private BigInteger GetPhi(BigInteger firstPrime, BigInteger secondPrime)
         {
-            firstPrime -= _one;
-            return firstPrime * (secondPrime - _one);
+            return (firstPrime - _one) * (secondPrime - _one);
         }
 
-        public BigInteger GetE(BigInteger phi, int length)
+        private BigInteger GetPublicKey(BigInteger phi, int length)
         {
-            BigInteger e = new BigInteger("0");
-            e = GetPrimeNumber(1);
+            BigInteger publicKey = new BigInteger("0");
             Random r = new Random();
 
-            while (phi.Mod(e).CompareTo(_zero) == 1)
-                e = GetPrimeNumber(r.Next(1, length - 1));
+            var g = _zero.Clone();
+            var _ = _zero.Clone();
 
-            return e;
+            while (g.CompareTo(_one) != 0)
+            {
+                publicKey = GetPrimeNumber(length);
+                g = ExtendedGCD(phi, publicKey, ref _, ref _);
+            }
+
+            return publicKey;
         }
 
-        public BigInteger GetN(BigInteger firstPrime, BigInteger secondPrime)
+        private BigInteger GetMod(BigInteger firstPrime, BigInteger secondPrime)
         {
             return firstPrime * secondPrime;
         }
 
-        public BigInteger GetD(BigInteger phi, BigInteger e)
-        {
-            return e.PowerMod(phi - _two, phi);
-        }
-
-        public static BigInteger GeneratePrivateKey(BigInteger e, BigInteger mod)
+        private BigInteger GeneratePrivateKey(BigInteger publicKey, BigInteger firstPrime, BigInteger secondPrime)
         {
             var x = new BigInteger("0");
             var y = new BigInteger("0");
 
-            var factors = GetPrimeFactors(mod);
-            var phi = GetPhi(factors);
+            var phi = GetPhi(firstPrime, secondPrime);
 
-            ExtendedGCD(e, phi, ref x, ref y);
+            ExtendedGCD(publicKey, phi, ref x, ref y);
+
             while (x.IsNeg())
             {
-                x = x.Add(phi);
+                x += phi;
             }
+
             return x;
         }
 
-        private static BigInteger ExtendedGCD(BigInteger a, BigInteger b, ref BigInteger x, ref BigInteger y)
+        private BigInteger ExtendedGCD(BigInteger a, BigInteger b, ref BigInteger x, ref BigInteger y)
         {
             if (_zero.CompareTo(b) == 0)
             {
@@ -91,40 +123,10 @@ namespace RSA
                 return a;
             }
 
-            var g = ExtendedGCD(b, a.Mod(b), ref y, ref x);
+            var g = ExtendedGCD(b, a % b, ref y, ref x);
             y -= a / b * x;
 
             return g;
-        }
-
-        private static List<BigInteger> GetPrimeFactors(BigInteger number)
-        {
-            var factors = new List<BigInteger>();
-            var cur = new BigInteger("2");
-
-            while (cur.CompareTo(number) == -1)
-            {
-                if (_zero.CompareTo(number.Mod(cur)) == 0)
-                {
-                    factors.Add(cur);
-                }
-
-                cur += _one;
-            }
-
-            return factors;
-        }
-
-        private static BigInteger GetPhi(List<BigInteger> factors)
-        {
-            var phi = new BigInteger("1");
-
-            foreach (var bigInteger in factors)
-            {
-                phi *= (bigInteger - _one);
-            }
-
-            return phi;
         }
     }
 }

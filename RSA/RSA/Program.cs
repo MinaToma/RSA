@@ -137,6 +137,7 @@ namespace RSA
                 int c = int.Parse(sr.ReadLine());
                 RSACore rsa = new RSACore(_number, _power, _mod);
 
+                
                 switch (c)
                 {
                     case 0:
@@ -186,6 +187,48 @@ namespace RSA
            string mod = "2039896550861909479";
            int pow = 7;
            string d = "1165655170271755543"; 
+            */
+            
+            //BigInteger a = new BigInteger("1005");
+            
+            BigInteger a = new BigInteger("89489425009274444368228545921773093919669586065884257445497854456487674839629818390934941973262879616797970608917283679875499331574161113854088813275488110588247193077582527278437906504015680623423550067240042466665654232383502922215493623289472138866445818789127946123407807725702626644091036502372545139713");
+            BigInteger b = new BigInteger("2");
+            BigInteger c = new BigInteger("0");
+
+            int start = Environment.TickCount;
+            while (a.CompareTo(c) != 0)
+            {
+                a /= b;
+                //Console.WriteLine(a);
+            }
+            int end = Environment.TickCount;
+            Console.WriteLine(end - start);
+
+            a = new BigInteger("89489425009274444368228545921773093919669586065884257445497854456487674839629818390934941973262879616797970608917283679875499331574161113854088813275488110588247193077582527278437906504015680623423550067240042466665654232383502922215493623289472138866445818789127946123407807725702626644091036502372545139713");
+
+            start = Environment.TickCount;
+            while(a.CompareTo(c) != 0)
+            {
+                a = new BigInteger( a.divideByTwo(a.value));
+               // Console.WriteLine(a);
+            }
+            end = Environment.TickCount;
+            Console.WriteLine(end - start);
+
+            //  Console.WriteLine(a.PowerMod(b, c));
+            /*
+            RSAKeyGenerator rSAKeyGenerator = new RSAKeyGenerator();
+
+            RSAKey rSAKey = rSAKeyGenerator.GenerateRSAKeys();
+
+            Console.WriteLine(rSAKey);
+
+            RSACore rSACore = new RSACore("2003", rSAKey.publicKey.ToString(), rSAKey.mod.ToString());
+            Console.WriteLine(rSACore.encrypt());
+            Console.WriteLine(rSACore.encrypt());
+            RSACore rSACore2 = new RSACore(rSACore.encrypt().ToString() , rSAKey.privateKey.ToString(), rSAKey.mod.ToString());
+
+            Console.WriteLine(rSACore2.encrypt());
             */
 
             char cont;

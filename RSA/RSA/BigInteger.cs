@@ -41,7 +41,7 @@ namespace RSA
                 return secondNumber.Sub(posValue);
             }
 
-            return new BigInteger(AddHelper(Clone(value), Clone(secondNumber.value)));
+            return new BigInteger(addHelper(clone(value), clone(secondNumber.value)));
         }
 
         public BigInteger Sub(BigInteger secondNumber)
@@ -54,7 +54,7 @@ namespace RSA
                 var secPosValue = secondNumber.Clone();
                 secPosValue.value.RemoveAt(0);
 
-                var res = new BigInteger(AddHelper(posValue.value, secPosValue.value));
+                var res = new BigInteger(addHelper(posValue.value, secPosValue.value));
                 res.value.Insert(0, '-');
 
                 return res;
@@ -65,7 +65,7 @@ namespace RSA
                 var posValue = Clone();
                 posValue.value.RemoveAt(0);
 
-                var res = new BigInteger(AddHelper(Clone(secondNumber.value), posValue.value));
+                var res = new BigInteger(addHelper(clone(secondNumber.value), posValue.value));
 
                 res.value.Insert(0, '-');
 
@@ -77,10 +77,10 @@ namespace RSA
                 var posValue = secondNumber.Clone();
                 posValue.value.RemoveAt(0);
 
-                return new BigInteger(AddHelper(Clone(value), posValue.value));
+                return new BigInteger(addHelper(clone(value), posValue.value));
             }
 
-            return new BigInteger(SubHelper(Clone(value), Clone(secondNumber.value)));
+            return new BigInteger(subHelper(clone(value), clone(secondNumber.value)));
         }
 
         public BigInteger Mul(BigInteger secondNumber)
@@ -105,7 +105,7 @@ namespace RSA
                 secPosValue.value.RemoveAt(0);
             }
 
-            BigInteger res = new BigInteger(MulHelper(posValue.value, secPosValue.value));
+            BigInteger res = new BigInteger(mulHelper(posValue.value, secPosValue.value));
 
             if (sign)
             {
@@ -149,17 +149,17 @@ namespace RSA
 
         public BigInteger PowerMod(BigInteger power, BigInteger mod)
         {
-            return new BigInteger(PowerModHelper(Clone(value), Clone(power.value), Clone(mod.value)));
+            return new BigInteger(powerModHelper(clone(value), clone(power.value), clone(mod.value)));
         }
 
         public BigInteger Mod(BigInteger mod)
         {
-            return new BigInteger(divHelper(Clone(value), Clone(mod.value)).remainder);
+            return new BigInteger(divHelper(clone(value), clone(mod.value)).remainder);
         }
 
         public BigInteger Clone()
         {
-            return new BigInteger(Clone(value));
+            return new BigInteger(clone(value));
         }
 
         public bool IsNeg()
@@ -169,7 +169,7 @@ namespace RSA
 
         public int CompareTo(BigInteger secondNumber)
         {
-            return IsSmaller(value, secondNumber.value);
+            return isSmaller(value, secondNumber.value);
         }
 
         public bool IsPrime()
@@ -192,7 +192,7 @@ namespace RSA
 
             for (int i = 0; i < k; i++)
             {
-                if (MillerTest(d, this) == false)
+                if (millerTest(d, this) == false)
                     return false;
             }
 
@@ -219,22 +219,61 @@ namespace RSA
             return firstValue.Div(secondValue);
         }
 
-        private List<char> PowerModHelper(List<char> number, List<char> power, List<char> mod)
+        public static BigInteger operator %(BigInteger number, BigInteger mod)
         {
-            var res = Clone(_one);
-            number = divHelper(number, mod).remainder;
+            return number.Mod(mod);
+        }
 
-            while (IsSmaller(Clone(_zero), power) == -1)
+        private List<char> powerModHelper(List<char> number, List<char> power, List<char> mod)
+        {
+            var res = clone(_one);
+            number = divHelper(number, clone(mod)).remainder;
+
+            while (isSmaller(clone(_zero), power) == -1)
             {
                 if ((power[power.Count - 1] - '0') % 2 == 1)
                 {
-                    res = MulHelper(res, number);
-                    res = divHelper(res, Clone(mod)).remainder;
+                    res = mulHelper(res, number);
+                    res = divHelper(res, clone(mod)).remainder;
+                    power[power.Count - 1]--;
                 }
 
-                power = divHelper(power, Clone(_two)).quotient;
-                number = MulHelper(Clone(number), Clone(number));
-                number = divHelper(number, Clone(mod)).remainder;
+                power = divideByTwo(power);
+                number = mulHelper(clone(number), clone(number));
+                number = divHelper(number, clone(mod)).remainder;
+            }
+
+            return res;
+        }
+
+        public List<char> divideByTwo(List<char> number)
+        {
+            int idx = 0;
+            List<char> res = new List<char>();
+            int curNum = 0;
+
+            while (idx < number.Count)
+            {
+                curNum *= 10;
+                curNum += (int)(number[idx++] - '0');
+                if (curNum >= 2)
+                {
+                    res.AddRange((curNum / 2).ToString());
+                    curNum %= 2;
+                }
+                else if (curNum == 0)
+                {
+                    res.Add('0');
+                }
+                else if (res.Count > 0 && curNum < 2)
+                {
+                    res.Add('0');
+                }
+            }
+
+            if (res.Count == 0)
+            {
+                res.Add('0');
             }
 
             return res;
@@ -242,29 +281,29 @@ namespace RSA
 
         private DivisionResult divHelper(List<char> firstList, List<char> secondList)
         {
-            if (IsSmaller(firstList, secondList) == -1)
+            if (isSmaller(firstList, secondList) == -1)
             {
-                return new DivisionResult(Clone(_zero), new List<char>(firstList.ToArray()));
+                return new DivisionResult(clone(_zero), new List<char>(firstList.ToArray()));
             }
 
-            var res = divHelper(firstList, MulHelper(secondList, Clone(_two)));
-            res.quotient = MulHelper(res.quotient, Clone(_two));
+            var res = divHelper(firstList, addHelper(clone(secondList), clone(secondList)));
+            res.quotient = addHelper(clone(res.quotient), clone(res.quotient));
 
-            if (IsSmaller(res.remainder, secondList) != -1)
+            if (isSmaller(res.remainder, secondList) != -1)
             {
-                res.quotient = AddHelper(res.quotient, Clone(_one));
-                res.remainder = SubHelper(res.remainder, secondList);
+                res.quotient = addHelper(res.quotient, clone(_one));
+                res.remainder = subHelper(res.remainder, secondList);
                 return res;
             }
 
             return res;
         }
 
-        private List<char> AddHelper(List<char> firstList, List<char> secondList)
+        private List<char> addHelper(List<char> firstList, List<char> secondList)
         {
-            Reverse(firstList);
-            Reverse(secondList);
-            MakeEqualLengthRightAppend(firstList, secondList);
+            reverse(firstList);
+            reverse(secondList);
+            makeEqualLengthRightAppend(firstList, secondList);
 
             var carry = 0;
             var sum = 0;
@@ -279,25 +318,27 @@ namespace RSA
             }
 
             if (carry > 0)
+            {
                 res.Add((char)(carry + '0'));
+            }
 
-            Reverse(res);
-            res = RemoveLeadingZeros(res);
+            reverse(res);
+            res = removeLeadingZeros(res);
 
-            Reverse(firstList);
-            Reverse(secondList);
+            reverse(firstList);
+            reverse(secondList);
 
             return res;
 
         }
 
-        private List<char> MulHelper(List<char> firstList, List<char> secondList)
+        private List<char> mulHelper(List<char> firstList, List<char> secondList)
         {
-            MakeEqualLengthLeftAppend(firstList, secondList);
+            makeEqualLengthLeftAppend(firstList, secondList);
 
             if (firstList.Count == 0)
             {
-                return Clone(_zero);
+                return clone(_zero);
             }
 
             if (firstList.Count == 1 || secondList.Count == 1)
@@ -314,32 +355,32 @@ namespace RSA
             var secondNumberL = secondList.GetRange(0, lowLen);
             var secondNumberH = secondList.GetRange(lowLen, highLen);
 
-            var left_left_result = MulHelper(firstNmberL, secondNumberL);
-            var right_right_result = MulHelper(firstNumberH, secondNumberH);
-            var leftF_rightF__leftS_rightS = MulHelper(AddHelper(firstNmberL, firstNumberH), AddHelper(secondNumberL, secondNumberH));
+            var left_left_result = mulHelper(firstNmberL, secondNumberL);
+            var right_right_result = mulHelper(firstNumberH, secondNumberH);
+            var leftF_rightF__leftS_rightS = mulHelper(addHelper(firstNmberL, firstNumberH), addHelper(secondNumberL, secondNumberH));
 
-            leftF_rightF__leftS_rightS = SubHelper(SubHelper(leftF_rightF__leftS_rightS, left_left_result), right_right_result);
+            leftF_rightF__leftS_rightS = subHelper(subHelper(leftF_rightF__leftS_rightS, left_left_result), right_right_result);
 
-            AppendZeros(leftF_rightF__leftS_rightS, highLen);
-            leftF_rightF__leftS_rightS = AddHelper(leftF_rightF__leftS_rightS, right_right_result);
+            appendZeros(leftF_rightF__leftS_rightS, highLen);
+            leftF_rightF__leftS_rightS = addHelper(leftF_rightF__leftS_rightS, right_right_result);
 
-            AppendZeros(left_left_result, highLen * 2);
+            appendZeros(left_left_result, highLen * 2);
 
-            return AddHelper(left_left_result, leftF_rightF__leftS_rightS);
+            return addHelper(left_left_result, leftF_rightF__leftS_rightS);
         }
 
-        private List<char> SubHelper(List<char> firstList, List<char> secondList)
+        private List<char> subHelper(List<char> firstList, List<char> secondList)
         {
             var NegRes = false;
-            if (IsSmaller(firstList, secondList) == -1)
+            if (isSmaller(firstList, secondList) == -1)
             {
-                Swap(ref firstList, ref secondList);
+                swap(ref firstList, ref secondList);
                 NegRes = true;
             }
 
-            Reverse(firstList);
-            Reverse(secondList);
-            MakeEqualLengthRightAppend(firstList, secondList);
+            reverse(firstList);
+            reverse(secondList);
+            makeEqualLengthRightAppend(firstList, secondList);
 
             var res = new List<char>();
             var borrow = 0;
@@ -362,19 +403,19 @@ namespace RSA
                 res.Add((char)(diff + '0'));
             }
 
-            Reverse(res);
-            res = RemoveLeadingZeros(res);
+            reverse(res);
+            res = removeLeadingZeros(res);
 
             if (NegRes)
                 res.Insert(0, '-');
 
-            Reverse(firstList);
-            Reverse(secondList);
+            reverse(firstList);
+            reverse(secondList);
 
             return res;
         }
 
-        private int IsSmaller(List<char> firstList, List<char> secondList)
+        private int isSmaller(List<char> firstList, List<char> secondList)
         {
             int len1 = firstList.Count, len2 = secondList.Count;
             if (len1 < len2)
@@ -402,7 +443,7 @@ namespace RSA
             return 0;
         }
 
-        private List<char> RemoveLeadingZeros(List<char> list)
+        private List<char> removeLeadingZeros(List<char> list)
         {
             var res = list.SkipWhile(c => c == '0').ToList();
             if (res.Count == 0)
@@ -412,7 +453,7 @@ namespace RSA
             return res;
         }
 
-        private void AppendZeros(List<char> list, int nunberOfZeros)
+        private void appendZeros(List<char> list, int nunberOfZeros)
         {
             for (int i = 0; i < nunberOfZeros; i++)
             {
@@ -420,18 +461,18 @@ namespace RSA
             }
         }
 
-        private void MakeEqualLengthLeftAppend(List<char> firstList, List<char> secondList)
+        private void makeEqualLengthLeftAppend(List<char> firstList, List<char> secondList)
         {
-            Reverse(firstList);
-            Reverse(secondList);
+            reverse(firstList);
+            reverse(secondList);
 
-            MakeEqualLengthRightAppend(firstList, secondList);
+            makeEqualLengthRightAppend(firstList, secondList);
 
-            Reverse(firstList);
-            Reverse(secondList);
+            reverse(firstList);
+            reverse(secondList);
         }
 
-        private void MakeEqualLengthRightAppend(List<char> firstList, List<char> secondList)
+        private void makeEqualLengthRightAppend(List<char> firstList, List<char> secondList)
         {
             while (firstList.Count < secondList.Count)
             {
@@ -444,24 +485,24 @@ namespace RSA
             }
         }
 
-        private void Reverse(List<char> list)
+        private void reverse(List<char> list)
         {
             list.Reverse();
         }
 
-        private void Swap(ref List<char> secondList, ref List<char> firstList)
+        private void swap(ref List<char> secondList, ref List<char> firstList)
         {
             var temp = secondList;
             secondList = firstList;
             firstList = temp;
         }
 
-        private List<char> Clone(List<char> list)
+        private List<char> clone(List<char> list)
         {
             return list.Select(s => s).ToList();
         }
 
-        private bool MillerTest(BigInteger d, BigInteger n)
+        private bool millerTest(BigInteger d, BigInteger n)
         {
             Random r = new Random();
 
@@ -471,10 +512,10 @@ namespace RSA
 
             var x = rand.PowerMod(d, n);
             var n_1 = n.Sub(new BigInteger("1"));
-            if (x.ToString() == "1" || IsSmaller(x.value, n_1.value) == 0)
+            if (x.ToString() == "1" || isSmaller(x.value, n_1.value) == 0)
                 return true;
 
-            while (IsSmaller(d.value, n_1.value) != 0)
+            while (isSmaller(d.value, n_1.value) != 0)
             {
                 x = x.Mul(x);
                 x = x.Mod(n);
@@ -482,7 +523,7 @@ namespace RSA
 
                 if (x.ToString() == "1")
                     return false;
-                if (IsSmaller(x.value, n_1.value) == 0)
+                if (isSmaller(x.value, n_1.value) == 0)
                     return true;
             }
             return false;
