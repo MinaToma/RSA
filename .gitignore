@@ -131,3 +131,7 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
+*.ide-wal
+*.ide-shm
+*.ide
+*.lock
