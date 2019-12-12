@@ -75,7 +75,10 @@ namespace RSA
             var phi = GetPhi(factors);
 
             ExtendedGCD(e, phi, ref x, ref y);
-
+            while (x.IsNeg())
+            {
+                x = x.Add(phi);
+            }
             return x;
         }
 
