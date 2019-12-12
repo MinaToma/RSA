@@ -52,14 +52,14 @@ namespace RSA
         static void Main(string[] args)
         {
 
-            /*BigInteger m = new BigInteger("2003");
+            BigInteger m = new BigInteger("2003");
             BigInteger e = new BigInteger("7");
             BigInteger n = new BigInteger("3713");
 
-            RSACore rsa = new RSACore( m, e, n);
+            RSACore rsa = new RSACore(m, e, n);
             Console.WriteLine(rsa.encrypt());
 
-            Console.WriteLine(rsa.decrypt());*/
+            Console.WriteLine(rsa.decrypt());
             /*
             RSAKeyGenerator rSAKeyGenerator = new RSAKeyGenerator();
 

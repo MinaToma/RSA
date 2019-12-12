@@ -467,5 +467,23 @@ namespace RSA
             }
             return false;
         }
+
+
+        public static BigInteger operator +(BigInteger firstValue, BigInteger secondValue)
+        {
+            return firstValue.Add(secondValue);
+        }
+        public static BigInteger operator -(BigInteger firstValue, BigInteger secondValue)
+        {
+            return firstValue.Sub(secondValue);
+        }
+        public static BigInteger operator *(BigInteger firstValue, BigInteger secondValue)
+        {
+            return firstValue.Mul(secondValue);
+        }
+        public static BigInteger operator /(BigInteger firstValue, BigInteger secondValue)
+        {
+            return firstValue.Div(secondValue);
+        }
     }
 }

@@ -30,18 +30,18 @@ namespace RSA
                 number += (num + 1);
             }
 
-            BigInteger pirmeNumber = new BigInteger(number);
+            BigInteger primeNumber = new BigInteger(number);
 
-            while (!pirmeNumber.IsPrime())
-                pirmeNumber = pirmeNumber.Add(_two);
+            while (!primeNumber.IsPrime())
+                primeNumber += _two;
 
-            return pirmeNumber;
+            return primeNumber;
         }
 
         public BigInteger GetPhi(BigInteger firstPrime, BigInteger secondPrime)
         {
-            firstPrime = firstPrime.Sub(_one);
-            return firstPrime.Mul(secondPrime.Sub(_one));
+            firstPrime -= _one;
+            return firstPrime * (secondPrime - _one);
         }
 
         public BigInteger GetE(BigInteger phi, int length)
@@ -58,12 +58,12 @@ namespace RSA
 
         public BigInteger GetN(BigInteger firstPrime, BigInteger secondPrime)
         {
-            return firstPrime.Mul(secondPrime);
+            return firstPrime * secondPrime;
         }
 
         public BigInteger GetD(BigInteger phi, BigInteger e)
         {
-            return e.PowerMod(phi.Sub(_two), phi);
+            return e.PowerMod(phi - _two, phi);
         }
 
         public static BigInteger GeneratePrivateKey(BigInteger e, BigInteger mod)
@@ -75,8 +75,6 @@ namespace RSA
             var phi = GetPhi(factors);
 
             ExtendedGCD(e, phi, ref x, ref y);
-
-
 
             return x;
         }
@@ -91,7 +89,7 @@ namespace RSA
             }
 
             var g = ExtendedGCD(b, a.Mod(b), ref y, ref x);
-            y = y.Sub(a.Div(b).Mul(x));
+            y -= a / b * x;
 
             return g;
         }
@@ -108,7 +106,7 @@ namespace RSA
                     factors.Add(cur);
                 }
 
-                cur = cur.Add(_one);
+                cur += _one;
             }
 
             return factors;
@@ -120,7 +118,7 @@ namespace RSA
 
             foreach (var bigInteger in factors)
             {
-                phi = phi.Mul(bigInteger.Sub(_one));
+                phi *= (bigInteger - _one);
             }
 
             return phi;
