@@ -138,7 +138,7 @@ namespace RSA
                 secPosValue.value.RemoveAt(0);
             }
 
-            var res = new BigInteger(divHelper(posValue.value, secPosValue.value).quotient);
+            var res = new BigInteger(quadraticDiv(posValue.value, secPosValue.value).quotient);
 
             if (sign)
             {
@@ -155,7 +155,7 @@ namespace RSA
 
         public BigInteger Mod(BigInteger mod)
         {
-            return new BigInteger(divHelper(clone(value), clone(mod.value)).remainder);
+            return new BigInteger(quadraticDiv(clone(value), clone(mod.value)).remainder);
         }
 
         public BigInteger Clone()
@@ -179,16 +179,16 @@ namespace RSA
             var two = new BigInteger("2");
             int k = 4;
 
-            if (this.ToString() == "1" || this.ToString() == "0" || this.ToString() == "4")
+            if (ToString() == "1" || ToString() == "0" || ToString() == "4")
                 return false;
-            if (this.ToString() == "2" || this.ToString() == "3")
+            if (ToString() == "2" || ToString() == "3")
                 return true;
 
-            var d = this.Sub(one);
+            var d = Sub(one);
 
             while (d.Mod(two).ToString() == "0")
             {
-                d = d.Div(two);
+                d.value = divideByTwo(d.value);
             }
 
             for (int i = 0; i < k; i++)
@@ -228,20 +228,20 @@ namespace RSA
         private List<char> powerModHelper(List<char> number, List<char> power, List<char> mod)
         {
             var res = clone(_one);
-            number = divHelper(number, clone(mod)).remainder;
+            number = quadraticDiv(number, clone(mod)).remainder;
 
             while (isSmaller(clone(_zero), power) == -1)
             {
                 if ((power[power.Count - 1] - '0') % 2 == 1)
                 {
                     res = multiplyFFT(res, number);
-                    res = divHelper(res, clone(mod)).remainder;
+                    res = quadraticDiv(res, clone(mod)).remainder;
                     power[power.Count - 1]--;
                 }
 
                 power = divideByTwo(power);
                 number = multiplyFFT(clone(number), clone(number));
-                number = divHelper(number, clone(mod)).remainder;
+                number = quadraticDiv(number, clone(mod)).remainder;
             }
 
             return res;
@@ -280,14 +280,14 @@ namespace RSA
             return res;
         }
 
-        private DivisionResult divHelper(List<char> firstList, List<char> secondList)
+        private DivisionResult slowDiv(List<char> firstList, List<char> secondList)
         {
             if (isSmaller(firstList, secondList) == -1)
             {
                 return new DivisionResult(clone(_zero), new List<char>(firstList.ToArray()));
             }
 
-            var res = divHelper(firstList, addHelper(clone(secondList), clone(secondList)));
+            var res = slowDiv(firstList, addHelper(clone(secondList), clone(secondList)));
             res.quotient = addHelper(clone(res.quotient), clone(res.quotient));
 
             if (isSmaller(res.remainder, secondList) != -1)
@@ -298,6 +298,42 @@ namespace RSA
             }
 
             return res;
+        }
+
+        private DivisionResult quadraticDiv(List<char> a, List<char> b)
+        {
+            BigInteger tempA = new BigInteger(a);
+
+            int df = a.Count - b.Count;
+            if (df < 0)
+            {
+                return new DivisionResult(clone(_zero), clone(value));
+            }
+
+            List<char> res = new List<char>();
+            BigInteger tempB = new BigInteger(clone(b));
+            appendZeros(tempB.value, df);
+
+            for (int i = 0; i <= df; i++)
+            {
+                int cnt = 0;
+                while (!tempA.IsNeg())
+                {
+                    cnt++;
+                    tempA -= tempB;
+                }
+
+                cnt--;
+                tempA += tempB;
+                res.Add((char)(cnt + '0'));
+
+                tempB.value.RemoveAt(tempB.value.Count - 1);
+            }
+
+            res = removeLeadingZeros(res);
+            tempA.value = removeLeadingZeros(tempA.value);
+
+            return new DivisionResult(res, tempA.value);
         }
 
         private List<char> addHelper(List<char> firstList, List<char> secondList)
