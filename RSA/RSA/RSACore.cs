@@ -9,7 +9,6 @@ namespace RSA
         private BigInteger _number;
         private BigInteger _power;
         private BigInteger _mod;
-        private BigInteger _powerInverse;
 
         public RSACore(string number, string power, string mod)
         {
@@ -18,15 +17,14 @@ namespace RSA
             _mod = new BigInteger(mod);
         }
 
-        public RSACore(BigInteger number, BigInteger power, BigInteger mod, BigInteger powerInverse)
+        public RSACore(BigInteger number, BigInteger power, BigInteger mod)
         {
             _number = number;
             _power = power;
             _mod = mod;
-            _powerInverse = powerInverse;
         }
 
-        public BigInteger encrypt()
+        public BigInteger Encrypt()
         {
             return _number.PowerMod(_power, _mod);
         }
