@@ -14,25 +14,23 @@ namespace RSA
 
         public RSAKey GenerateRSAKeys()
         {
-            var firstPrime = GetPrimeNumber(primeLength);
-            var secondPrime = GetPrimeNumber(primeLength);
+            var firstPrime = getPrimeNumber(primeLength);
+            var secondPrime = getPrimeNumber(primeLength);
 
-            while(secondPrime.CompareTo(firstPrime) == 0)
+            while (secondPrime.CompareTo(firstPrime) == 0)
             {
-                secondPrime = GetPrimeNumber(primeLength);
+                secondPrime = getPrimeNumber(primeLength);
             }
 
-            Console.WriteLine(firstPrime + " " + secondPrime);
-
-            var mod = GetMod(firstPrime, secondPrime);
-            var phi = GetPhi(firstPrime, secondPrime);
-            var publicKey = GetPublicKey(phi, primeLength - 1);
+            var mod = getMod(firstPrime, secondPrime);
+            var phi = getPhi(firstPrime, secondPrime);
+            var publicKey = getPublicKey(phi, primeLength - 1);
             var privateKey = GeneratePrivateKey(publicKey, firstPrime, secondPrime);
 
             return new RSAKey(privateKey, publicKey, mod);
         }
 
-        private BigInteger GetPrimeNumber(int length)
+        private BigInteger getPrimeNumber(int length)
         {
             string number = "";
             Random r = new Random();
@@ -62,20 +60,20 @@ namespace RSA
                 primeNumber += _two;
             }
 
-            if(primeNumber.value.Count > primeLength)
+            if (primeNumber.value.Count > primeLength)
             {
-                return GetPrimeNumber(primeLength);
+                return getPrimeNumber(primeLength);
             }
 
             return primeNumber;
         }
 
-        private BigInteger GetPhi(BigInteger firstPrime, BigInteger secondPrime)
+        private BigInteger getPhi(BigInteger firstPrime, BigInteger secondPrime)
         {
             return (firstPrime - _one) * (secondPrime - _one);
         }
 
-        private BigInteger GetPublicKey(BigInteger phi, int length)
+        private BigInteger getPublicKey(BigInteger phi, int length)
         {
             BigInteger publicKey = new BigInteger("0");
             Random r = new Random();
@@ -85,14 +83,14 @@ namespace RSA
 
             while (g.CompareTo(_one) != 0)
             {
-                publicKey = GetPrimeNumber(length);
-                g = ExtendedGCD(phi, publicKey, ref _, ref _);
+                publicKey = getPrimeNumber(length);
+                g = extendedGCD(phi, publicKey, ref _, ref _);
             }
 
             return publicKey;
         }
 
-        private BigInteger GetMod(BigInteger firstPrime, BigInteger secondPrime)
+        private BigInteger getMod(BigInteger firstPrime, BigInteger secondPrime)
         {
             return firstPrime * secondPrime;
         }
@@ -102,9 +100,9 @@ namespace RSA
             var x = new BigInteger("0");
             var y = new BigInteger("0");
 
-            var phi = GetPhi(firstPrime, secondPrime);
+            var phi = getPhi(firstPrime, secondPrime);
 
-            ExtendedGCD(publicKey, phi, ref x, ref y);
+            extendedGCD(publicKey, phi, ref x, ref y);
 
             while (x.IsNeg())
             {
@@ -114,7 +112,7 @@ namespace RSA
             return x;
         }
 
-        private BigInteger ExtendedGCD(BigInteger a, BigInteger b, ref BigInteger x, ref BigInteger y)
+        private BigInteger extendedGCD(BigInteger a, BigInteger b, ref BigInteger x, ref BigInteger y)
         {
             if (_zero.CompareTo(b) == 0)
             {
@@ -123,7 +121,7 @@ namespace RSA
                 return a;
             }
 
-            var g = ExtendedGCD(b, a % b, ref y, ref x);
+            var g = extendedGCD(b, a % b, ref y, ref x);
             y -= a / b * x;
 
             return g;

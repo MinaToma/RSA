@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace RSA
 {
@@ -105,7 +106,7 @@ namespace RSA
                 secPosValue.value.RemoveAt(0);
             }
 
-            BigInteger res = new BigInteger(mulHelper(posValue.value, secPosValue.value));
+            BigInteger res = new BigInteger(mulKaratsuba(posValue.value, secPosValue.value));
 
             if (sign)
             {
@@ -233,13 +234,13 @@ namespace RSA
             {
                 if ((power[power.Count - 1] - '0') % 2 == 1)
                 {
-                    res = mulHelper(res, number);
+                    res = multiplyFFT(res, number);
                     res = divHelper(res, clone(mod)).remainder;
                     power[power.Count - 1]--;
                 }
 
                 power = divideByTwo(power);
-                number = mulHelper(clone(number), clone(number));
+                number = multiplyFFT(clone(number), clone(number));
                 number = divHelper(number, clone(mod)).remainder;
             }
 
@@ -301,18 +302,29 @@ namespace RSA
 
         private List<char> addHelper(List<char> firstList, List<char> secondList)
         {
-            reverse(firstList);
-            reverse(secondList);
-            makeEqualLengthRightAppend(firstList, secondList);
-
-            var carry = 0;
             var sum = 0;
-            var len = firstList.Count;
+            var carry = 0;
+            var fIdx = firstList.Count - 1;
+            var sIdx = secondList.Count - 1;
             var res = new List<char>();
 
-            for (int i = 0; i < len; i++)
+            while (fIdx > -1 && sIdx > -1)
             {
-                sum = (firstList[i] - '0') + (secondList[i] - '0') + carry;
+                sum = (firstList[fIdx--] - '0') + (secondList[sIdx--] - '0') + carry;
+                res.Add((char)((sum % 10) + '0'));
+                carry = sum / 10;
+            }
+
+            while (fIdx > -1)
+            {
+                sum = (firstList[fIdx--] - '0') + carry;
+                res.Add((char)((sum % 10) + '0'));
+                carry = sum / 10;
+            }
+
+            while (sIdx > -1)
+            {
+                sum = (secondList[sIdx--] - '0') + carry;
                 res.Add((char)((sum % 10) + '0'));
                 carry = sum / 10;
             }
@@ -325,14 +337,10 @@ namespace RSA
             reverse(res);
             res = removeLeadingZeros(res);
 
-            reverse(firstList);
-            reverse(secondList);
-
             return res;
-
         }
 
-        private List<char> mulHelper(List<char> firstList, List<char> secondList)
+        private List<char> mulKaratsuba(List<char> firstList, List<char> secondList)
         {
             makeEqualLengthLeftAppend(firstList, secondList);
 
@@ -355,9 +363,9 @@ namespace RSA
             var secondNumberL = secondList.GetRange(0, lowLen);
             var secondNumberH = secondList.GetRange(lowLen, highLen);
 
-            var left_left_result = mulHelper(firstNmberL, secondNumberL);
-            var right_right_result = mulHelper(firstNumberH, secondNumberH);
-            var leftF_rightF__leftS_rightS = mulHelper(addHelper(firstNmberL, firstNumberH), addHelper(secondNumberL, secondNumberH));
+            var left_left_result = mulKaratsuba(firstNmberL, secondNumberL);
+            var right_right_result = mulKaratsuba(firstNumberH, secondNumberH);
+            var leftF_rightF__leftS_rightS = mulKaratsuba(addHelper(firstNmberL, firstNumberH), addHelper(secondNumberL, secondNumberH));
 
             leftF_rightF__leftS_rightS = subHelper(subHelper(leftF_rightF__leftS_rightS, left_left_result), right_right_result);
 
@@ -378,17 +386,49 @@ namespace RSA
                 NegRes = true;
             }
 
-            reverse(firstList);
-            reverse(secondList);
-            makeEqualLengthRightAppend(firstList, secondList);
-
-            var res = new List<char>();
+            var diff = 0;
             var borrow = 0;
-            var len = firstList.Count;
+            var fIdx = firstList.Count - 1;
+            var sIdx = secondList.Count - 1;
+            var res = new List<char>();
 
-            for (int i = 0; i < len; i++)
+            while (fIdx > -1 && sIdx > -1)
             {
-                int diff = (firstList[i] - '0') - borrow - (secondList[i] - '0');
+                diff = (firstList[fIdx--] - '0') - (secondList[sIdx--] - '0') - borrow;
+
+                if (diff < 0)
+                {
+                    diff += 10;
+                    borrow = 1;
+                }
+                else
+                {
+                    borrow = 0;
+                }
+
+                res.Add((char)(diff + '0'));
+            }
+
+            while (fIdx > -1)
+            {
+                diff = (firstList[fIdx--] - '0') - borrow;
+
+                if (diff < 0)
+                {
+                    diff += 10;
+                    borrow = 1;
+                }
+                else
+                {
+                    borrow = 0;
+                }
+
+                res.Add((char)(diff + '0'));
+            }
+
+            while (sIdx > -1)
+            {
+                diff = (secondList[sIdx--] - '0') - borrow;
 
                 if (diff < 0)
                 {
@@ -408,9 +448,6 @@ namespace RSA
 
             if (NegRes)
                 res.Insert(0, '-');
-
-            reverse(firstList);
-            reverse(secondList);
 
             return res;
         }
@@ -527,6 +564,115 @@ namespace RSA
                     return true;
             }
             return false;
+        }
+
+        private List<char> multiplyFFT(List<char> first, List<char> second)
+        {
+            int size = 1, lg_size = 0;
+            while (size <= first.Count + second.Count)
+            {
+                size *= 2;
+                lg_size++;
+            }
+
+            var fourierFirst = new List<Complex>(Enumerable.Repeat(new Complex(0.0, 0.0), size));
+            var fourierSecond = new List<Complex>(Enumerable.Repeat(new Complex(0.0, 0.0), size));
+            var fourierResult = new List<Complex>(Enumerable.Repeat(new Complex(0.0, 0.0), size));
+
+            for (int i = 0; i < first.Count; i++)
+            {
+                fourierFirst[i] = new Complex(first[i] - '0', 0.0);
+            }
+            for (int i = 0; i < second.Count; i++)
+            {
+                fourierSecond[i] = new Complex(second[i] - '0', 0.0);
+            }
+
+            fft(ref fourierFirst, lg_size, false);
+            fft(ref fourierSecond, lg_size, false);
+
+            for (int i = 0; i < size; i++)
+            {
+                fourierResult[i] = fourierFirst[i] * fourierSecond[i];
+            }
+
+            fft(ref fourierResult, lg_size, true);
+
+            List<char> res = new List<char>();
+            bool ok = false;
+            int carry = 0;
+            for (int i = size - 1; i >= 0; i--)
+            {
+                if (!ok)
+                {
+                    if (((int)Math.Round(fourierResult[i].Real, 9)) != 0)
+                    {
+                        ok = true;
+                    }
+                }
+
+                if (ok)
+                {
+                    int cur = (int)Math.Round(fourierResult[i].Real, 9) + carry;
+                    carry = cur / 10;
+                    res.Add((char)((cur % 10) + '0'));
+                }
+            }
+
+            if (carry != 0)
+            {
+                res.AddRange(carry.ToString());
+            }
+
+            reverse(res);
+            res = removeLeadingZeros(res);
+
+            return res;
+        }
+
+        private void fft(ref List<Complex> input, int lg_size, bool invert)
+        {
+            if (input.Count <= 1) return;
+
+            List<int> reverse = new List<int>();
+            reverse.Add(0);
+            int highest_bit = 0;
+            for (int i = 1; i < input.Count; i++)
+            {
+                if (i >= (1 << (highest_bit + 1))) highest_bit++;
+                reverse.Add(reverse[i - (1 << highest_bit)] | (1 << (lg_size - 1 - highest_bit)));
+                if (i < reverse[i])
+                {
+                    Complex temp = input[i];
+                    input[i] = input[reverse[i]];
+                    input[reverse[i]] = temp;
+                }
+            }
+
+            for (int length = 2; length <= input.Count; length *= 2)
+            {
+                double angle = 2 * Math.PI / length * (invert ? -1.0 : 1.0);
+                Complex wangle = new Complex(Math.Cos(angle), Math.Sin(angle));
+                for (int i = 0; i < input.Count; i += length)
+                {
+                    Complex current = new Complex(1.0, 0.0);
+                    for (int j = 0; j < length / 2; j++)
+                    {
+                        Complex u = input[i + j], v = input[i + j + length / 2] * current;
+                        input[i + j] = u + v;
+                        input[i + j + length / 2] = u - v;
+                        current *= wangle;
+                    }
+                }
+            }
+
+            if (invert)
+            {
+                for (int i = 0; i < input.Count; i++)
+                {
+                    input[i] /= input.Count;
+                }
+            }
         }
     }
 }
