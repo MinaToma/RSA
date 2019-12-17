@@ -6,10 +6,10 @@ namespace RSA
 {
     public class DivisionResult
     {
-        public List<char> quotient { get; set; }
-        public List<char> remainder { get; set; }
+        public List<int> quotient { get; set; }
+        public List<int> remainder { get; set; }
 
-        public DivisionResult(List<char> q, List<char> r)
+        public DivisionResult(List<int> q, List<int> r)
         {
             quotient = q;
             remainder = r;

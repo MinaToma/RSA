@@ -7,37 +7,42 @@ namespace RSA
 {
     public class BigInteger
     {
-        public List<char> value;
-        private List<char> _two = new List<char>("2");
-        private List<char> _zero = new List<char>("0");
-        private List<char> _one = new List<char>("1");
+
+        public List<int> value;
+        private List<int> _two = new List<int>() { 2 };
+        private List<int> _zero = new List<int>() { 0 };
+        private List<int> _one = new List<int>() { 1 };
 
         public override string ToString()
         {
-            return new string(value.ToArray());
+            if (value[0] >= 0)
+                return convertListIntToString(value);
+            else
+                return "-" + (Math.Abs(value[0])) + convertListIntToString(value.GetRange(1, value.Count - 2));
+
         }
 
         public BigInteger(string val)
         {
-            value = val.ToList();
+            value = val.ToCharArray().Select(s => int.Parse(s.ToString())).ToList();
         }
 
-        public BigInteger(List<char> val)
+        public BigInteger(List<int> val)
         {
             value = val;
         }
 
         public BigInteger Add(BigInteger secondNumber)
         {
-            if (secondNumber.value[0] == '-')
+            if (secondNumber.value[0] < 0)
             {
                 return Sub(secondNumber);
             }
 
-            if (value[0] == '-')
+            if (value[0] < 0)
             {
                 var posValue = Clone();
-                posValue.value.RemoveAt(0);
+                posValue.value[0] *= -1;
 
                 return secondNumber.Sub(posValue);
             }
@@ -47,36 +52,36 @@ namespace RSA
 
         public BigInteger Sub(BigInteger secondNumber)
         {
-            if (value[0] == '-' && secondNumber.value[0] == '-')
+            if (value[0] < 0 && secondNumber.value[0] < 0)
             {
                 var posValue = Clone();
-                posValue.value.RemoveAt(0);
+                posValue.value[0] *= -1; ;
 
                 var secPosValue = secondNumber.Clone();
-                secPosValue.value.RemoveAt(0);
+                secPosValue.value[0] *= -1; ;
 
                 var res = new BigInteger(addHelper(posValue.value, secPosValue.value));
-                res.value.Insert(0, '-');
+                res.value[0] *= -1; ;
 
                 return res;
             }
 
-            if (value[0] == '-')
+            if (value[0] < 0)
             {
                 var posValue = Clone();
-                posValue.value.RemoveAt(0);
+                posValue.value[0] *= -1;
 
                 var res = new BigInteger(addHelper(clone(secondNumber.value), posValue.value));
 
-                res.value.Insert(0, '-');
+                res.value[0] *= -1;
 
                 return res;
             }
 
-            if (secondNumber.value[0] == '-')
+            if (secondNumber.value[0] < 0)
             {
                 var posValue = secondNumber.Clone();
-                posValue.value.RemoveAt(0);
+                posValue.value[0] *= -1;
 
                 return new BigInteger(addHelper(clone(value), posValue.value));
             }
@@ -88,7 +93,7 @@ namespace RSA
         {
             bool sign = false;
 
-            if ((secondNumber.value[0] == '-' && value[0] != '-') || (secondNumber.value[0] != '-' && value[0] == '-'))
+            if ((secondNumber.value[0] < 0 && value[0] >= 0) || (secondNumber.value[0] >= 0 && value[0] < 0))
             {
                 sign = true;
             }
@@ -96,21 +101,21 @@ namespace RSA
             var posValue = Clone();
             var secPosValue = secondNumber.Clone();
 
-            if (posValue.value[0] == '-')
+            if (posValue.value[0] < 0)
             {
-                posValue.value.RemoveAt(0);
+                posValue.value[0] *= -1;
             }
 
-            if (secPosValue.value[0] == '-')
+            if (secPosValue.value[0] < 0)
             {
-                secPosValue.value.RemoveAt(0);
+                secPosValue.value[0] *= -1;
             }
 
             BigInteger res = new BigInteger(mulKaratsuba(posValue.value, secPosValue.value));
 
             if (sign)
             {
-                res.value.Insert(0, '-');
+                res.value[0] *= -1;
             }
 
             return res;
@@ -120,7 +125,7 @@ namespace RSA
         {
             bool sign = false;
 
-            if ((secondNumber.value[0] == '-' && value[0] != '-') || (secondNumber.value[0] != '-' && value[0] == '-'))
+            if ((secondNumber.value[0] < 0 && value[0] >= 0) || (secondNumber.value[0] >= 0 && value[0] < 0))
             {
                 sign = true;
             }
@@ -128,21 +133,21 @@ namespace RSA
             var posValue = Clone();
             var secPosValue = secondNumber.Clone();
 
-            if (posValue.value[0] == '-')
+            if (posValue.value[0] < 0)
             {
-                posValue.value.RemoveAt(0);
+                posValue.value[0] *= -1;
             }
 
-            if (secPosValue.value[0] == '-')
+            if (secPosValue.value[0] < 0)
             {
-                secPosValue.value.RemoveAt(0);
+                secPosValue.value[0] *= -1;
             }
 
             var res = new BigInteger(quadraticDiv(posValue.value, secPosValue.value).quotient);
 
             if (sign)
             {
-                res.value.Insert(0, '-');
+                res.value[0] *= -1;
             }
 
             return res;
@@ -165,7 +170,7 @@ namespace RSA
 
         public bool IsNeg()
         {
-            return value[0] == '-';
+            return value[0] < 0;
         }
 
         public int CompareTo(BigInteger secondNumber)
@@ -225,14 +230,14 @@ namespace RSA
             return number.Mod(mod);
         }
 
-        private List<char> powerModHelper(List<char> number, List<char> power, List<char> mod)
+        private List<int> powerModHelper(List<int> number, List<int> power, List<int> mod)
         {
             var res = clone(_one);
             number = quadraticDiv(number, clone(mod)).remainder;
 
             while (isSmaller(clone(_zero), power) == -1)
             {
-                if ((power[power.Count - 1] - '0') % 2 == 1)
+                if ((power[power.Count - 1]) % 2 == 1)
                 {
                     res = multiplyFFT(res, number);
                     res = quadraticDiv(res, clone(mod)).remainder;
@@ -247,44 +252,44 @@ namespace RSA
             return res;
         }
 
-        public List<char> divideByTwo(List<char> number)
+        public List<int> divideByTwo(List<int> number)
         {
             int idx = 0;
-            List<char> res = new List<char>();
+            List<int> res = new List<int>();
             int curNum = 0;
 
             while (idx < number.Count)
             {
                 curNum *= 10;
-                curNum += (int)(number[idx++] - '0');
+                curNum += (number[idx++]);
                 if (curNum >= 2)
                 {
-                    res.AddRange((curNum / 2).ToString());
+                    res.AddRange(convertStringToListInt((curNum / 2).ToString()));
                     curNum %= 2;
                 }
                 else if (curNum == 0)
                 {
-                    res.Add('0');
+                    res.Add(0);
                 }
                 else if (res.Count > 0 && curNum < 2)
                 {
-                    res.Add('0');
+                    res.Add(0);
                 }
             }
 
             if (res.Count == 0)
             {
-                res.Add('0');
+                res.Add(0);
             }
 
             return res;
         }
 
-        private DivisionResult slowDiv(List<char> firstList, List<char> secondList)
+        private DivisionResult slowDiv(List<int> firstList, List<int> secondList)
         {
             if (isSmaller(firstList, secondList) == -1)
             {
-                return new DivisionResult(clone(_zero), new List<char>(firstList.ToArray()));
+                return new DivisionResult(clone(_zero), new List<int>(firstList.ToArray()));
             }
 
             var res = slowDiv(firstList, addHelper(clone(secondList), clone(secondList)));
@@ -300,7 +305,7 @@ namespace RSA
             return res;
         }
 
-        private DivisionResult quadraticDiv(List<char> a, List<char> b)
+        private DivisionResult quadraticDiv(List<int> a, List<int> b)
         {
             BigInteger tempA = new BigInteger(a);
 
@@ -310,7 +315,7 @@ namespace RSA
                 return new DivisionResult(clone(_zero), clone(value));
             }
 
-            List<char> res = new List<char>();
+            List<int> res = new List<int>();
             BigInteger tempB = new BigInteger(clone(b));
             appendZeros(tempB.value, df);
 
@@ -325,7 +330,7 @@ namespace RSA
 
                 cnt--;
                 tempA += tempB;
-                res.Add((char)(cnt + '0'));
+                res.Add(cnt);
 
                 tempB.value.RemoveAt(tempB.value.Count - 1);
             }
@@ -336,38 +341,38 @@ namespace RSA
             return new DivisionResult(res, tempA.value);
         }
 
-        private List<char> addHelper(List<char> firstList, List<char> secondList)
+        private List<int> addHelper(List<int> firstList, List<int> secondList)
         {
             var sum = 0;
             var carry = 0;
             var fIdx = firstList.Count - 1;
             var sIdx = secondList.Count - 1;
-            var res = new List<char>();
+            var res = new List<int>();
 
             while (fIdx > -1 && sIdx > -1)
             {
-                sum = (firstList[fIdx--] - '0') + (secondList[sIdx--] - '0') + carry;
-                res.Add((char)((sum % 10) + '0'));
+                sum = firstList[fIdx--] + secondList[sIdx--] + carry;
+                res.Add(sum % 10);
                 carry = sum / 10;
             }
 
             while (fIdx > -1)
             {
-                sum = (firstList[fIdx--] - '0') + carry;
-                res.Add((char)((sum % 10) + '0'));
+                sum = firstList[fIdx--] + carry;
+                res.Add(sum % 10);
                 carry = sum / 10;
             }
 
             while (sIdx > -1)
             {
-                sum = (secondList[sIdx--] - '0') + carry;
-                res.Add((char)((sum % 10) + '0'));
+                sum = secondList[sIdx--] + carry;
+                res.Add(sum % 10);
                 carry = sum / 10;
             }
 
             if (carry > 0)
             {
-                res.Add((char)(carry + '0'));
+                res.Add(carry);
             }
 
             reverse(res);
@@ -376,7 +381,7 @@ namespace RSA
             return res;
         }
 
-        private List<char> mulKaratsuba(List<char> firstList, List<char> secondList)
+        private List<int> mulKaratsuba(List<int> firstList, List<int> secondList)
         {
             makeEqualLengthLeftAppend(firstList, secondList);
 
@@ -387,7 +392,7 @@ namespace RSA
 
             if (firstList.Count == 1 || secondList.Count == 1)
             {
-                return new List<char>(((firstList[0] - '0') * (secondList[0] - '0')).ToString());
+                return convertStringToListInt((firstList[0] * secondList[0]).ToString());
             }
 
             var lowLen = firstList.Count / 2;
@@ -413,7 +418,7 @@ namespace RSA
             return addHelper(left_left_result, leftF_rightF__leftS_rightS);
         }
 
-        private List<char> subHelper(List<char> firstList, List<char> secondList)
+        private List<int> subHelper(List<int> firstList, List<int> secondList)
         {
             var NegRes = false;
             if (isSmaller(firstList, secondList) == -1)
@@ -426,11 +431,11 @@ namespace RSA
             var borrow = 0;
             var fIdx = firstList.Count - 1;
             var sIdx = secondList.Count - 1;
-            var res = new List<char>();
+            var res = new List<int>();
 
             while (fIdx > -1 && sIdx > -1)
             {
-                diff = (firstList[fIdx--] - '0') - (secondList[sIdx--] - '0') - borrow;
+                diff = firstList[fIdx--] - secondList[sIdx--] - borrow;
 
                 if (diff < 0)
                 {
@@ -442,12 +447,12 @@ namespace RSA
                     borrow = 0;
                 }
 
-                res.Add((char)(diff + '0'));
+                res.Add(diff);
             }
 
             while (fIdx > -1)
             {
-                diff = (firstList[fIdx--] - '0') - borrow;
+                diff = firstList[fIdx--] - borrow;
 
                 if (diff < 0)
                 {
@@ -459,12 +464,12 @@ namespace RSA
                     borrow = 0;
                 }
 
-                res.Add((char)(diff + '0'));
+                res.Add(diff);
             }
 
             while (sIdx > -1)
             {
-                diff = (secondList[sIdx--] - '0') - borrow;
+                diff = secondList[sIdx--] - borrow;
 
                 if (diff < 0)
                 {
@@ -476,19 +481,19 @@ namespace RSA
                     borrow = 0;
                 }
 
-                res.Add((char)(diff + '0'));
+                res.Add(diff);
             }
 
             reverse(res);
             res = removeLeadingZeros(res);
 
             if (NegRes)
-                res.Insert(0, '-');
+                res[0] *= -1;
 
             return res;
         }
 
-        private int isSmaller(List<char> firstList, List<char> secondList)
+        private int isSmaller(List<int> firstList, List<int> secondList)
         {
             int len1 = firstList.Count, len2 = secondList.Count;
             if (len1 < len2)
@@ -516,25 +521,25 @@ namespace RSA
             return 0;
         }
 
-        private List<char> removeLeadingZeros(List<char> list)
+        private List<int> removeLeadingZeros(List<int> list)
         {
-            var res = list.SkipWhile(c => c == '0').ToList();
+            var res = list.SkipWhile(c => c == 0).ToList();
             if (res.Count == 0)
             {
-                res.Add('0');
+                res.Add(0);
             }
             return res;
         }
 
-        private void appendZeros(List<char> list, int nunberOfZeros)
+        private void appendZeros(List<int> list, int nunberOfZeros)
         {
             for (int i = 0; i < nunberOfZeros; i++)
             {
-                list.Add('0');
+                list.Add(0);
             }
         }
 
-        private void makeEqualLengthLeftAppend(List<char> firstList, List<char> secondList)
+        private void makeEqualLengthLeftAppend(List<int> firstList, List<int> secondList)
         {
             reverse(firstList);
             reverse(secondList);
@@ -545,34 +550,48 @@ namespace RSA
             reverse(secondList);
         }
 
-        private void makeEqualLengthRightAppend(List<char> firstList, List<char> secondList)
+        private void makeEqualLengthRightAppend(List<int> firstList, List<int> secondList)
         {
             while (firstList.Count < secondList.Count)
             {
-                firstList.Add('0');
+                firstList.Add(0);
             }
 
             while (firstList.Count > secondList.Count)
             {
-                secondList.Add('0');
+                secondList.Add(0);
             }
         }
+        private List<int> convertStringToListInt(String str)
+        {
+            List<int> list = new List<int>();
+            for (int i = 0; i < str.Length; i++)
+            {
+                list.Add((int)(str[i] - '0'));
+            }
+            return list;
+        }
 
-        private void reverse(List<char> list)
+        private string convertListIntToString(List<int> list)
+        {
+            return new string(list.Select(s => (char)(s + '0')).ToArray());
+        }
+
+        private void reverse(List<int> list)
         {
             list.Reverse();
         }
 
-        private void swap(ref List<char> secondList, ref List<char> firstList)
+        private void swap(ref List<int> secondList, ref List<int> firstList)
         {
             var temp = secondList;
             secondList = firstList;
             firstList = temp;
         }
 
-        private List<char> clone(List<char> list)
+        private List<int> clone(List<int> list)
         {
-            return list.Select(s => s).ToList();
+            return new List<int>(list);
         }
 
         private bool millerTest(BigInteger d, BigInteger n)
@@ -602,7 +621,7 @@ namespace RSA
             return false;
         }
 
-        private List<char> multiplyFFT(List<char> first, List<char> second)
+        private List<int> multiplyFFT(List<int> first, List<int> second)
         {
             int size = 1, lg_size = 0;
             while (size <= first.Count + second.Count)
@@ -617,11 +636,11 @@ namespace RSA
 
             for (int i = 0; i < first.Count; i++)
             {
-                fourierFirst[i] = new Complex(first[i] - '0', 0.0);
+                fourierFirst[i] = new Complex(first[i], 0.0);
             }
             for (int i = 0; i < second.Count; i++)
             {
-                fourierSecond[i] = new Complex(second[i] - '0', 0.0);
+                fourierSecond[i] = new Complex(second[i], 0.0);
             }
 
             fft(ref fourierFirst, lg_size, false);
@@ -634,7 +653,7 @@ namespace RSA
 
             fft(ref fourierResult, lg_size, true);
 
-            List<char> res = new List<char>();
+            List<int> res = new List<int>();
             bool ok = false;
             int carry = 0;
             for (int i = size - 1; i >= 0; i--)
@@ -651,13 +670,13 @@ namespace RSA
                 {
                     int cur = (int)Math.Round(fourierResult[i].Real, 9) + carry;
                     carry = cur / 10;
-                    res.Add((char)((cur % 10) + '0'));
+                    res.Add((int)((cur % 10) + '0'));
                 }
             }
 
             if (carry != 0)
             {
-                res.AddRange(carry.ToString());
+                res.AddRange(convertStringToListInt(carry.ToString()));
             }
 
             reverse(res);

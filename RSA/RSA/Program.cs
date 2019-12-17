@@ -48,6 +48,7 @@ namespace RSA
                 File.Delete("SampleRSA_I/Answer" + file);
 
             int N = int.Parse(sr.ReadLine());
+            int nStart = Environment.TickCount;
             for (int i = 0; i < N; i++)
             {
                 FileStream fsA = new FileStream("SampleRSA_I/Answer" + file, FileMode.Append);
@@ -77,6 +78,8 @@ namespace RSA
                 sw.Close();
                 fsA.Close();
             }
+            int nEnd = Environment.TickCount;
+            Console.WriteLine("Test " + file.Substring(0,3).PadRight(2) + " passed.   Time " + (nEnd - nStart).ToString().PadRight(5) + " ms");
             sr.Close();
             fsQ.Close();
         }
@@ -162,6 +165,7 @@ namespace RSA
 
         static void Main(string[] args)
         {
+
             char cont;
             do
             {

@@ -25,15 +25,16 @@ namespace RSA
 
         public static string GetAsciiString(string msg)
         {
-            string ans = "";
+            List<int> ans = new List<int>();
             var msgBigInteger = new BigInteger(msg);
-            while (msg != "0")
+            while (msg.Length>1 || msg != "0")
             {
                 var mod = msgBigInteger.Mod(_base);
-                ans += (char)int.Parse(mod.ToString());
+                ans.AddRange(mod.ToString().Select(s => int.Parse(s.ToString())).ToArray());
                 msgBigInteger = msgBigInteger.Div(_base);
             }
-            return new string(ans.ToCharArray().Reverse().ToArray());
+            ans.Reverse();
+            return new string(ans.Select(s => char.Parse(s.ToString())).ToArray());
         }
 
         private static string converAsciiToDecimal(char ch)
