@@ -7,18 +7,20 @@ namespace RSA
 {
     public class BigInteger
     {
-
         public List<int> value;
-        private List<int> _two = new List<int>() { 2 };
-        private List<int> _zero = new List<int>() { 0 };
         private List<int> _one = new List<int>() { 1 };
+        private List<int> _zero = new List<int>() { 0 };
 
         public override string ToString()
         {
             if (value[0] >= 0)
+            {
                 return convertListIntToString(value);
+            }
             else
+            {
                 return "-" + (Math.Abs(value[0])) + (value.Count - 2 >= 0 ? convertListIntToString(value.GetRange(1, value.Count - 2)) : "");
+            }
 
         }
 
@@ -72,7 +74,6 @@ namespace RSA
                 posValue.value[0] *= -1;
 
                 var res = new BigInteger(addHelper(clone(secondNumber.value), posValue.value));
-
                 res.value[0] *= -1;
 
                 return res;
@@ -618,6 +619,7 @@ namespace RSA
                 if (isSmaller(x.value, n_1.value) == 0)
                     return true;
             }
+
             return false;
         }
 
