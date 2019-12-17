@@ -48,6 +48,7 @@ namespace RSA
                 File.Delete("SampleRSA_I/Answer" + file);
 
             int N = int.Parse(sr.ReadLine());
+            int nStart = Environment.TickCount;
             for (int i = 0; i < N; i++)
             {
                 FileStream fsA = new FileStream("SampleRSA_I/Answer" + file, FileMode.Append);
@@ -77,6 +78,8 @@ namespace RSA
                 sw.Close();
                 fsA.Close();
             }
+            int nEnd = Environment.TickCount;
+            Console.WriteLine("Test " + file.Substring(0, 3).PadRight(2) + " passed.   Time " + (nEnd - nStart).ToString().PadRight(5) + " ms");
             sr.Close();
             fsQ.Close();
         }
@@ -160,6 +163,56 @@ namespace RSA
             Console.WriteLine("AVERAGE TIME = " + (((double)(end - start)) / N).ToString().PadRight(6) + " ms");
         }
 
+        public static void Bonus1()
+        {
+            Console.WriteLine("Enter Message");
+            string msg = Console.ReadLine();
+            var decimalMessage = new BigInteger(AsciiKey.GetDecimalString(msg));
+            string n;
+
+            while (true)
+            {
+                Console.WriteLine("Enter N");
+                n = Console.ReadLine();
+                if (decimalMessage.value.Count > n.Length)
+                {
+                    Console.WriteLine("Please Enter N greater than message");
+                }
+                else
+                    break;
+            }
+
+            Console.WriteLine("Enter E");
+            var e = Console.ReadLine();
+
+            var E = new BigInteger(e);
+            var N = new BigInteger(n);
+
+            int start = Environment.TickCount;
+            var answer = decimalMessage.PowerMod(E, N);
+            var asciiEncrypted = AsciiKey.GetAsciiString(answer.ToString());
+            int end = Environment.TickCount;
+
+            Console.WriteLine(decimalMessage.ToString());
+            Console.WriteLine("The Encrypted Decimal Message ");
+            Console.WriteLine(answer);
+            Console.WriteLine("The Encrypted Message");
+            Console.WriteLine(asciiEncrypted);
+            Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms");
+        }
+
+        public static void Bonus2()
+        {
+            int start = Environment.TickCount;
+
+            RSAKeyGenerator keyGenerator = new RSAKeyGenerator();
+            RSAKey key = keyGenerator.GenerateRSAKeys();
+            int end = Environment.TickCount;
+
+            Console.WriteLine(key.ToString());
+            Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms");
+        }
+
         static void Main(string[] args)
         {
             char cont;
@@ -168,6 +221,8 @@ namespace RSA
                 Console.WriteLine("-----------------------------------------------------------");
                 Console.WriteLine("(1) Milestone 1");
                 Console.WriteLine("(2) Milestone 2");
+                Console.WriteLine("(3) Bonus 1");
+                Console.WriteLine("(4) Bonus 2");
                 Console.WriteLine("-----------------------------------------------------------");
                 Console.Write("Enter choice: ");
                 int choice = int.Parse(Console.ReadLine());
@@ -179,6 +234,12 @@ namespace RSA
                         break;
                     case 2:
                         Milestone2();
+                        break;
+                    case 3:
+                        Bonus1();
+                        break;
+                    case 4:
+                        Bonus2();
                         break;
                     default:
                         Console.WriteLine("Invalid choice!");

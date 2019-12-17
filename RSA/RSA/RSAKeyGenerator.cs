@@ -9,7 +9,6 @@ namespace RSA
         private BigInteger _zero = new BigInteger("0");
         private BigInteger _one = new BigInteger("1");
         private BigInteger _two = new BigInteger("2");
-        private string numericalString = "0123456789";
         private int primeLength = 4;
 
         public RSAKey GenerateRSAKeys()
@@ -32,25 +31,23 @@ namespace RSA
 
         private BigInteger getPrimeNumber(int length)
         {
-            string number = "";
+            List<int> number = new List<int>();
             Random r = new Random();
             for (int i = 0; i < length; i++)
             {
                 if (i == 0)
                 {
-                    number += numericalString[r.Next(1, 9)];
+                    number.Add(r.Next(1,9));
                 }
                 else
                 {
-                    number += numericalString[r.Next(0, 9)];
+                    number.Add(r.Next(0, 9));
                 }
             }
 
-            if ((number[length - 1] - '0') % 2 == 0)
+            if ((number[length - 1]) % 2 == 0)
             {
-                char num = number[length - 1];
-                number.Remove(length - 1);
-                number += (num + 1);
+                number[length - 1]++;
             }
 
             BigInteger primeNumber = new BigInteger(number);

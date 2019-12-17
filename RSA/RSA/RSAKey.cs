@@ -20,7 +20,7 @@ namespace RSA
         override
         public string ToString()
         {
-            return privateKey.ToString() + " " + publicKey.ToString() + " " + mod.ToString();
+            return "The N is " + mod.ToString() + "  The E is " + publicKey.ToString() + " The D is " + privateKey.ToString();
         }
     }
 }
