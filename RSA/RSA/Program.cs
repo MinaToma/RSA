@@ -162,6 +162,7 @@ namespace RSA
             Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms");
             Console.WriteLine("AVERAGE TIME = " + (((double)(end - start)) / N).ToString().PadRight(6) + " ms");
         }
+
         public static void Bonus1()
         {
             Console.WriteLine("Enter Message");
@@ -199,6 +200,7 @@ namespace RSA
             Console.WriteLine(asciiEncrypted);
             Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms");
         }
+
         public static void Bonus2()
         {
             int start = Environment.TickCount;
