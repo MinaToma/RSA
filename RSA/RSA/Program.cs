@@ -209,7 +209,6 @@ namespace RSA
 
             Console.WriteLine(key.ToString());
             Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms");
-
         }
 
         static void Main(string[] args)
