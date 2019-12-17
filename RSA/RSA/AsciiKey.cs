@@ -17,30 +17,44 @@ namespace RSA
             {
                 var convertedNumber = new BigInteger(converAsciiToDecimal(msg[i]));
                 var baseMul = convertedNumber.Mul(pow);
-                ans.Add(baseMul);
-                pow.Mul(_base);
+                ans = ans.Add(baseMul);
+                pow = pow.Mul(_base);
             }
             return ans.ToString();
         }
 
         public static string GetAsciiString(string msg)
         {
-            List<int> ans = new List<int>();
+            List<char> ans = new List<char>();
             var msgBigInteger = new BigInteger(msg);
-            while (msg.Length>1 || msg != "0")
+            while (msgBigInteger.value.Count > 1 || msgBigInteger.ToString() != "0")
             {
                 var mod = msgBigInteger.Mod(_base);
-                ans.AddRange(mod.ToString().Select(s => int.Parse(s.ToString())).ToArray());
+                ans.Add((char) int.Parse(mod.ToString()));
                 msgBigInteger = msgBigInteger.Div(_base);
             }
             ans.Reverse();
-            return new string(ans.Select(s => char.Parse(s.ToString())).ToArray());
+            return new string (ans.ToArray());
         }
 
         private static string converAsciiToDecimal(char ch)
         {
             int number = (int)ch;
             return number.ToString();
+        }
+        private static List<int> convertStringToListInt(String str)
+        {
+            List<int> list = new List<int>();
+            for (int i = 0; i < str.Length; i++)
+            {
+                list.Add((int)(str[i] - '0'));
+            }
+            return list;
+        }
+
+        private static string convertListIntToString(List<int> list)
+        {
+            return new string(list.Select(s => (char)(s + '0')).ToArray());
         }
     }
 }
