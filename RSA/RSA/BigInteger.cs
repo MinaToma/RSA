@@ -18,7 +18,7 @@ namespace RSA
             if (value[0] >= 0)
                 return convertListIntToString(value);
             else
-                return "-" + (Math.Abs(value[0])) + convertListIntToString(value.GetRange(1, value.Count - 2));
+                return "-" + (Math.Abs(value[0])) + (value.Count - 2 >= 0 ? convertListIntToString(value.GetRange(1, value.Count - 2)) : "");
 
         }
 
@@ -246,7 +246,7 @@ namespace RSA
 
                 power = divideByTwo(power);
                 number = multiplyFFT(clone(number), clone(number));
-                number = quadraticDiv(number, clone(mod)).remainder;
+                number = quadraticDiv(clone(number), clone(mod)).remainder;
             }
 
             return res;
@@ -312,7 +312,7 @@ namespace RSA
             int df = a.Count - b.Count;
             if (df < 0)
             {
-                return new DivisionResult(clone(_zero), clone(value));
+                return new DivisionResult(clone(_zero), clone(tempA.value));
             }
 
             List<int> res = new List<int>();
@@ -636,11 +636,11 @@ namespace RSA
 
             for (int i = 0; i < first.Count; i++)
             {
-                fourierFirst[i] = new Complex(first[i], 0.0);
+                fourierFirst[i] = new Complex(first[first.Count - i - 1], 0.0);
             }
             for (int i = 0; i < second.Count; i++)
             {
-                fourierSecond[i] = new Complex(second[i], 0.0);
+                fourierSecond[i] = new Complex(second[second.Count - i - 1], 0.0);
             }
 
             fft(ref fourierFirst, lg_size, false);
@@ -654,24 +654,22 @@ namespace RSA
             fft(ref fourierResult, lg_size, true);
 
             List<int> res = new List<int>();
-            bool ok = false;
             int carry = 0;
-            for (int i = size - 1; i >= 0; i--)
-            {
-                if (!ok)
-                {
-                    if (((int)Math.Round(fourierResult[i].Real, 9)) != 0)
-                    {
-                        ok = true;
-                    }
-                }
 
-                if (ok)
+            int idx = size - 1;
+            for (; idx >= 0; idx--)
+            {
+                if (((int)Math.Round(fourierResult[idx].Real, 9)) != 0)
                 {
-                    int cur = (int)Math.Round(fourierResult[i].Real, 9) + carry;
-                    carry = cur / 10;
-                    res.Add((int)((cur % 10) + '0'));
+                    break;
                 }
+            }
+
+            for (int j = 0; j <= idx; j++)
+            {
+                int cur = (int)Math.Round(fourierResult[j].Real, 9) + carry;
+                carry = cur / 10;
+                res.Add(((cur % 10)));
             }
 
             if (carry != 0)

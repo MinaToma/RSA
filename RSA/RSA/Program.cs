@@ -165,6 +165,13 @@ namespace RSA
 
         static void Main(string[] args)
         {
+            var a = new BigInteger("111");
+            var b = new BigInteger("2");
+            
+            var x = new BigInteger("62");
+            var y = new BigInteger("65");
+            var z = new BigInteger("133");
+            Console.WriteLine(x.PowerMod(y, z));
 
             char cont;
             do
