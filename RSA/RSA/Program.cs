@@ -79,7 +79,8 @@ namespace RSA
                 fsA.Close();
             }
             int nEnd = Environment.TickCount;
-            Console.WriteLine("Test " + file.Substring(0, 3).PadRight(2) + " passed.   Time " + (nEnd - nStart).ToString().PadRight(5) + " ms");
+            float seconds = (nEnd - nStart) / 1000.0f;
+            Console.WriteLine("Test " + file.Substring(0, 3).PadRight(2) + " passed.   Time " + (nEnd - nStart).ToString().PadRight(5) + " ms = " + (seconds).ToString().PadRight(5) + " sec");
             sr.Close();
             fsQ.Close();
         }
@@ -152,15 +153,18 @@ namespace RSA
                         break;
                 }
                 int nEnd = Environment.TickCount;
-                Console.WriteLine("Test #" + (i + 1).ToString().PadRight(2) + " passed.   Time " + (nEnd - nStart).ToString().PadRight(5) + " ms");
+                float nSeconds = (nEnd - nStart) / 1000.0f;
+                Console.WriteLine("Test #" + (i + 1).ToString().PadRight(2) + " passed.   Time " + (nEnd - nStart).ToString().PadRight(5) + " ms = " + (nSeconds).ToString().PadRight(5) + " sec");
                 sw.Close();
                 fsA.Close();
             }
             sr.Close();
             fsQ.Close();
             int end = Environment.TickCount;
-            Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms");
-            Console.WriteLine("AVERAGE TIME = " + (((double)(end - start)) / N).ToString().PadRight(6) + " ms");
+
+            float seconds = (end - start) / 1000.0f;
+            Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms = " + (seconds).ToString().PadRight(5) + " sec");
+            Console.WriteLine("AVERAGE TIME = " + (((float)(end - start)) / N).ToString().PadRight(6) + " ms = " + ((float)(seconds / N)).ToString().PadRight(5) + " sec");
         }
 
         public static void Bonus1()
@@ -193,12 +197,14 @@ namespace RSA
             var asciiEncrypted = AsciiKey.GetAsciiString(answer.ToString());
             int end = Environment.TickCount;
 
+            float seconds = (end - start) / 1000.0f;
+
             Console.WriteLine(decimalMessage.ToString());
             Console.WriteLine("The Encrypted Decimal Message ");
             Console.WriteLine(answer);
             Console.WriteLine("The Encrypted Message");
             Console.WriteLine(asciiEncrypted);
-            Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms");
+            Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms = " + (seconds).ToString().PadRight(5) + " sec");
         }
 
         public static void Bonus2()
@@ -209,8 +215,10 @@ namespace RSA
             RSAKey key = keyGenerator.GenerateRSAKeys();
             int end = Environment.TickCount;
 
+            float seconds = (end - start) / 1000.0f;
+
             Console.WriteLine(key.ToString());
-            Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms");
+            Console.WriteLine("TOTAL   TIME = " + (end - start).ToString().PadRight(6) + " ms = " + (seconds).ToString().PadRight(5) + " sec");
         }
 
         static void Main(string[] args)
